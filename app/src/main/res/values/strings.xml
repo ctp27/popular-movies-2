@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Popular Movies</string>
+    <string name="pop_menu_item">Popular</string>
+    <string name="toprated_menu_item">Top Rated</string>
+    <string name="err_msg">Whoops! There was an error fetching the data. Check your internet connection and try aggain</string>
+    <string name="details_usr_rating">User Rating : </string>
+    <string name="details_mov_title">Movie Title</string>
+    <string name="details_rel_date">Released on </string>
+</resources>
