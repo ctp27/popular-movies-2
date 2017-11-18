@@ -95,8 +95,6 @@ public class MainActivity extends AppCompatActivity implements PopularAdapter.Po
 
     @Override
     public void onPosterClick(Movie movieClicked) {
-//        TODO:Right intent to redirect to movie details activity
-//        Toast.makeText(this, "Clicked", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(MainActivity.this,DetailsActivity.class);
         intent.putExtra("movieObj",movieClicked);
         startActivity(intent);
@@ -136,7 +134,6 @@ public class MainActivity extends AppCompatActivity implements PopularAdapter.Po
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-//                TODO: show the recyclerview
                 hideErrorMessage();
                 theAdapter = new PopularAdapter(moviesList,MainActivity.this);
                 gridRecyclerView.setAdapter(theAdapter);
@@ -180,7 +177,6 @@ public class MainActivity extends AppCompatActivity implements PopularAdapter.Po
         refreshBtn.setVisibility(View.VISIBLE);
         errorMessage.setVisibility(View.VISIBLE);
         isErrorMessageDisplayed = true;
-//        TODO: Create layout and logic for displaying error message
     }
     private void hideErrorMessage(){
 

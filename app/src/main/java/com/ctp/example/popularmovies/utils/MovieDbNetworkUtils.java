@@ -16,6 +16,7 @@ import java.util.Scanner;
 
 public class MovieDbNetworkUtils {
 
+//    TODO: Set MOVIE_API_KEY to your own API key
     private static final String MOVIEDB_API_KEY=Constants.MOVIEDB_API_KEY;
 
     private static final String TAG = MovieDbNetworkUtils.class.getSimpleName();
