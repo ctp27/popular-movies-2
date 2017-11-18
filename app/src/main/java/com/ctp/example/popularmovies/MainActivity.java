@@ -37,13 +37,15 @@ public class MainActivity extends AppCompatActivity implements PopularAdapter.Po
     private TextView errorMessage;
     private Button refreshBtn;
 
+    private boolean isErrorMessageDisplayed;
+
     private PopularAdapter theAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        isErrorMessageDisplayed = false;
         gridRecyclerView = findViewById(R.id.recycler_grid);
         progressBar =  findViewById(R.id.loading_indicator);
         errorMessage = findViewById(R.id.error_message_display);
@@ -118,6 +120,9 @@ public class MainActivity extends AppCompatActivity implements PopularAdapter.Po
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            if(isErrorMessageDisplayed){
+                hideErrorMessage();
+            }
             displayProgressBar();
         }
 
@@ -174,12 +179,14 @@ public class MainActivity extends AppCompatActivity implements PopularAdapter.Po
         gridRecyclerView.setVisibility(View.INVISIBLE);
         refreshBtn.setVisibility(View.VISIBLE);
         errorMessage.setVisibility(View.VISIBLE);
+        isErrorMessageDisplayed = true;
 //        TODO: Create layout and logic for displaying error message
     }
     private void hideErrorMessage(){
 
         errorMessage.setVisibility(View.INVISIBLE);
         refreshBtn.setVisibility(View.INVISIBLE);
+        isErrorMessageDisplayed = false;
     }
 
 }

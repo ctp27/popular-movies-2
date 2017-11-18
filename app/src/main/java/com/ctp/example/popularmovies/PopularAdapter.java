@@ -44,8 +44,8 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.PopularA
 
         View theView = inflater.inflate(R.layout.recycler_row_item,parent,false);
 
-        PopularAdapterViewHolder viewHolder = new PopularAdapterViewHolder(theView);
-        return viewHolder;
+        return new PopularAdapterViewHolder(theView);
+
     }
 
     @Override

@@ -7,4 +7,6 @@
     <string name="details_mov_title">Movie Title</string>
     <string name="details_rel_date">Released on </string>
     <string name="refresh">Refresh</string>
+    <string name="movie_poster">Movie Poster</string>
+    <string name="synopsis">Synopsis</string>
 </resources>
