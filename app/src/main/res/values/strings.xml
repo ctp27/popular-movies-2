@@ -6,4 +6,5 @@
     <string name="details_usr_rating">User Rating : </string>
     <string name="details_mov_title">Movie Title</string>
     <string name="details_rel_date">Released on </string>
+    <string name="refresh">Refresh</string>
 </resources>

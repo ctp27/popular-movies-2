@@ -16,7 +16,7 @@ import java.util.List;
 public class PopularMovieUtils  {
 
 
-    private static final String IMG_BASE_URL="http://image.tmdb.org/t/p/w185";
+    private static final String IMG_BASE_URL="http://image.tmdb.org/t/p/w342";
 
 
     public static List<Movie> getMoviesListFromJson(String jsonString) throws JSONException {
