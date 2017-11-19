@@ -7,76 +7,87 @@
     tools:context="com.ctp.example.popularmovies.DetailsActivity"
     android:padding="10dp">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        >
-
-        <ImageView
-            android:layout_width="150dp"
-            android:layout_height="200dp"
-            android:src="@drawable/placeholder_img"
-            android:id="@+id/details_mov_poster"
-            android:contentDescription="@string/movie_poster" />
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:orientation="vertical"
-            android:padding="20dp"
+            android:orientation="horizontal"
             >
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="30sp"
-                android:text="@string/details_mov_title"
-                android:textStyle="bold"
-                android:id="@+id/details_mov_title"
-                />
+            <ImageView
+                android:layout_width="150dp"
+                android:layout_height="200dp"
+                android:src="@drawable/placeholder_img"
+                android:id="@+id/details_mov_poster"
+                android:contentDescription="@string/movie_poster" />
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/details_usr_rating"
-                android:id="@+id/details_usr_rating"
-                android:textSize="16sp"
-                android:layout_marginTop="2dp"
-                />
+                android:layout_marginTop="10dp"
+                android:orientation="vertical"
+                android:padding="20dp"
+                >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="30sp"
+                    android:text="@string/details_mov_title"
+                    android:textStyle="bold"
+                    android:id="@+id/details_mov_title"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/details_usr_rating"
+                    android:id="@+id/details_usr_rating"
+                    android:textSize="16sp"
+                    android:layout_marginTop="2dp"
+                    />
 
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/details_rel_date"
-                android:id="@+id/details_release_date"
-                android:textSize="16sp"
-                android:layout_marginTop="2dp"
-                />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/details_rel_date"
+                    android:id="@+id/details_release_date"
+                    android:textSize="16sp"
+                    android:layout_marginTop="2dp"
+                    />
+
+
+            </LinearLayout>
 
 
         </LinearLayout>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/details_synopsis_title"
+            android:layout_marginTop="10dp"
+            android:text="@string/synopsis"
+            android:textStyle="bold"
+            android:textSize="25sp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/details_synopsis_content"
+            android:textSize="15sp"
+           />
 
     </LinearLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/details_synopsis_title"
-        android:layout_marginTop="10dp"
-        android:text="@string/synopsis"
-        android:textStyle="bold"
-        android:textSize="25sp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/details_synopsis_content"
-        android:textSize="15sp"
-       />
-
+    </ScrollView>
 </LinearLayout>

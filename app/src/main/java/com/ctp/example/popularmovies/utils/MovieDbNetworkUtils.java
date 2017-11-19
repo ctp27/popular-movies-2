@@ -3,6 +3,8 @@ package com.ctp.example.popularmovies.utils;
 import android.net.Uri;
 import android.util.Log;
 
+import com.ctp.example.popularmovies.BuildConfig;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -16,8 +18,8 @@ import java.util.Scanner;
 
 public class MovieDbNetworkUtils {
 
-//    TODO: Set MOVIE_API_KEY to your own API key
-    private static final String MOVIEDB_API_KEY=Constants.MOVIEDB_API_KEY;
+//    TODO: Set MOVIE_API_KEY in the build config
+    private static final String MOVIEDB_API_KEY= BuildConfig.API_KEY;
 
     private static final String TAG = MovieDbNetworkUtils.class.getSimpleName();
 
