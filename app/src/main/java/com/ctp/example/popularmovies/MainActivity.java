@@ -178,6 +178,7 @@ public class MainActivity extends AppCompatActivity implements PopularAdapter.Po
         errorMessage.setVisibility(View.VISIBLE);
         isErrorMessageDisplayed = true;
     }
+
     private void hideErrorMessage(){
 
         errorMessage.setVisibility(View.INVISIBLE);
