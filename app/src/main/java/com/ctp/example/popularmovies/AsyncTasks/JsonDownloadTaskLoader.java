@@ -19,15 +19,11 @@ public class JsonDownloadTaskLoader extends AsyncTaskLoader<String> {
     private String theJsonData;
     int sortOrder;
 
-    private DownloadTaskLoaderCallbacks loaderCallbacks;
 
-    public interface DownloadTaskLoaderCallbacks{
-        void onStartedLoading();
-    }
 
-    public JsonDownloadTaskLoader(Context context, int sortOrder, DownloadTaskLoaderCallbacks callbacks) {
+    public JsonDownloadTaskLoader(Context context, int sortOrder) {
         super(context);
-        loaderCallbacks = callbacks;
+
         this.sortOrder = sortOrder;
     }
 
@@ -45,7 +41,6 @@ public class JsonDownloadTaskLoader extends AsyncTaskLoader<String> {
 
     @Override
     public String loadInBackground() {
-        loaderCallbacks.onStartedLoading();
         String jsonData = null;
 
         try {

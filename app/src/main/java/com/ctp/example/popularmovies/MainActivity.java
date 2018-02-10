@@ -31,13 +31,14 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
         PopularAdapter.PopularAdapterClickListener,
-        LoaderManager.LoaderCallbacks<Object>,
-        JsonDownloadTaskLoader.DownloadTaskLoaderCallbacks{
+        LoaderManager.LoaderCallbacks<Object>{
 
     private static final String TAG = MainActivity.class.getSimpleName();
     public static final String LOADER_BUNDLE_URL_KEY="the-url-key";
     public static final int LOADER_JSON_DOWNLOAD_KEY=1000;
     public static final int LOADER_CURSOR_LOADER_KEY = 2000;
+
+    private static final String BUNDLE_SAVE_FAV_STATE_KEY="fav_state_jet";
 
 
     private boolean isDisplayingFavorites;
@@ -70,10 +71,6 @@ public class MainActivity extends AppCompatActivity implements
         gridRecyclerView.setLayoutManager(theManager);
         gridRecyclerView.setHasFixedSize(true);
 
-        Bundle bundle = new Bundle();
-        bundle.putInt(LOADER_BUNDLE_URL_KEY,MovieDbNetworkUtils.POPULAR_MOVIES);
-        getSupportLoaderManager().initLoader(LOADER_JSON_DOWNLOAD_KEY,bundle,this);
-
 
 
         refreshBtn.setOnClickListener(new View.OnClickListener() {
@@ -84,6 +81,12 @@ public class MainActivity extends AppCompatActivity implements
                 getSupportLoaderManager().restartLoader(LOADER_JSON_DOWNLOAD_KEY,bundle,MainActivity.this);
             }
         });
+
+        if(savedInstanceState!=null){
+            if(savedInstanceState.containsKey(BUNDLE_SAVE_FAV_STATE_KEY)){
+                isDisplayingFavorites = savedInstanceState.getBoolean(BUNDLE_SAVE_FAV_STATE_KEY);
+            }
+        }
 
     }
 
@@ -101,6 +104,20 @@ public class MainActivity extends AppCompatActivity implements
         super.onResume();
         if(isDisplayingFavorites){
             getSupportLoaderManager().restartLoader(LOADER_CURSOR_LOADER_KEY,null,this);
+        }else{
+            Bundle bundle = new Bundle();
+            bundle.putInt(LOADER_BUNDLE_URL_KEY, MovieDbNetworkUtils.POPULAR_MOVIES);
+            getSupportLoaderManager().initLoader(LOADER_JSON_DOWNLOAD_KEY, bundle, this);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(isDisplayingFavorites){
+            outState.putBoolean(BUNDLE_SAVE_FAV_STATE_KEY,isDisplayingFavorites);
+        }else{
+            outState.putBoolean(BUNDLE_SAVE_FAV_STATE_KEY,isDisplayingFavorites);
         }
     }
 
@@ -121,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case R.id.sort_favorite_btn:
                 getSupportLoaderManager().restartLoader(LOADER_CURSOR_LOADER_KEY,null,this);
-
+                break;
             default:
                 return super.onOptionsItemSelected(item);
 
@@ -147,35 +164,25 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public Loader onCreateLoader(int id, Bundle args) {
-        switch (id){
-            case LOADER_JSON_DOWNLOAD_KEY:
-                return new JsonDownloadTaskLoader(this,args.getInt(LOADER_BUNDLE_URL_KEY),this);
-            case LOADER_CURSOR_LOADER_KEY:
-                return new CursorLoader(this,
-                        MovieDbContract.MovieFavoriteEntry.FAVORITE_CONTENT_URI,
-                        PopularMovieUtils.cursorLoaderProjection,
-                        null,
-                        null,
-                        null);
-        }
-        return null;
-    }
-
-    @Override
-    public void onStartedLoading() {
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if(isErrorMessageDisplayed){
-                    hideErrorMessage();
-                }
-                displayProgressBar();
+        if (isErrorMessageDisplayed) {
+            hideErrorMessage();
+           }
+            displayProgressBar();
+            switch (id) {
+                case LOADER_JSON_DOWNLOAD_KEY:
+                    return new JsonDownloadTaskLoader(this, args.getInt(LOADER_BUNDLE_URL_KEY));
+                case LOADER_CURSOR_LOADER_KEY:
+                    return new CursorLoader(this,
+                            MovieDbContract.MovieFavoriteEntry.FAVORITE_CONTENT_URI,
+                            PopularMovieUtils.cursorLoaderProjection,
+                            null,
+                            null,
+                            null);
+                default:
+                    return null;
             }
-        });
 
-        Log.d(TAG,"Called Start Loading");
-    }
+        }
 
     @Override
     public void onLoadFinished(Loader<Object> loader, Object data) {
@@ -192,11 +199,15 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-
     @Override
     public void onLoaderReset(Loader<Object> loader) {
         updateRecyclerView(null,true);
     }
+
+
+
+
+
 
     private void displayJsonData(String theData){
         if (theData != null) {
@@ -205,14 +216,18 @@ public class MainActivity extends AppCompatActivity implements
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            hideErrorMessage();
+            if(isErrorMessageDisplayed) {
+                hideErrorMessage();
+                Log.d(TAG,"Error message is hidden");
+            }
             updateRecyclerView(moviesList,false);
+            hideProgressBar();
+
         } else {
+            hideProgressBar();
             displayErrorMessage();
         }
 
-        hideProgressBar();
-        Log.d(TAG, "Called Hide ");
         isDisplayingFavorites = false;
     }
 
@@ -226,6 +241,12 @@ public class MainActivity extends AppCompatActivity implements
 
         updateRecyclerView(moviesList,true);
         isDisplayingFavorites = true;
+        Log.d(TAG,"DisplayCursorDataCalled");
+        if(isErrorMessageDisplayed){
+            hideErrorMessage();
+            Log.d(TAG,"Error message is hidden");
+        }
+        hideProgressBar();
     }
 
     private void updateRecyclerView(List<Movie> moviesList, boolean isCursorData){
@@ -270,6 +291,7 @@ public class MainActivity extends AppCompatActivity implements
 
         errorMessage.setVisibility(View.INVISIBLE);
         refreshBtn.setVisibility(View.INVISIBLE);
+        gridRecyclerView.setVisibility(View.VISIBLE);
         isErrorMessageDisplayed = false;
     }
 

@@ -10,6 +10,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -28,6 +29,8 @@ import java.util.List;
 public class DetailsActivity extends AppCompatActivity
                     implements LoaderManager.LoaderCallbacks<Object>{
 
+    private static final String TAG = DetailsActivity.class.getSimpleName();
+
     public static final String MOVIE_OBJECT_TRANSFER_KEY="movie-tranfer-object";
     public static final String MOVIE_IS_CURSOR_DATA_KEY = "cursor-data-key";
     public static final String MOVIE_STORED_ID_KEY="stored-movie_id";
@@ -35,6 +38,8 @@ public class DetailsActivity extends AppCompatActivity
     private static final int CURSOR_LOADER_CHECK_IF_FAVORITE_KEY = 112;
     private static final int LOADER_GET_REVIEWS_AND_TRAILERS = 113;
     private static final String INSTANCE_BOOLEAN_STATE_KEY = "booll";
+
+
 
     private ImageView moviePoster;
     private TextView movieTitle;
@@ -68,9 +73,10 @@ public class DetailsActivity extends AppCompatActivity
     private void getMovieObjectFromSender() {
         Intent receivedIntent = getIntent();
         if(receivedIntent!=null){
-
+            Log.d(TAG,"Received intent is not null");
             if(receivedIntent.hasExtra(MOVIE_IS_CURSOR_DATA_KEY)){
                 isCursorData = receivedIntent.getBooleanExtra(MOVIE_IS_CURSOR_DATA_KEY,false);
+                Log.d(TAG,"isCursorData is "+isCursorData);
             }
 
             if(isCursorData){
@@ -78,11 +84,13 @@ public class DetailsActivity extends AppCompatActivity
 //                TODO: startCursorLoader to get this movie information
                 Bundle bundle = new Bundle();
                 bundle.putInt(MOVIE_STORED_ID_KEY,movieId);
-                getSupportLoaderManager().initLoader(CURSOR_LOADER_ALL_DETAILS_KEY,bundle,this);
+                getSupportLoaderManager().restartLoader(CURSOR_LOADER_ALL_DETAILS_KEY,bundle,this);
+                Log.d(TAG,"Restarted Loader");
             }
             else{
                 movie = (Movie) receivedIntent.getSerializableExtra(MOVIE_OBJECT_TRANSFER_KEY);
                 displayDataFromMovieObject();
+                Log.d(TAG,"Displaying from object movie "+movie.getTitle());
 //               TODO: Call method to initialize the data
             }
         }
@@ -106,6 +114,9 @@ public class DetailsActivity extends AppCompatActivity
             startService(intent);
             isAddedToFavorites = false;
             showRemovingFromFavoriteToast();
+            if(isCursorData){
+                finish();
+            }
         }
         else{
             highlightFavoriteButtonBasedOnBoolean(true);
