@@ -2,9 +2,9 @@ package com.ctp.example.popularmovies;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -31,13 +31,16 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
         PopularAdapter.PopularAdapterClickListener,
-        LoaderManager.LoaderCallbacks<String>,
+        LoaderManager.LoaderCallbacks<Object>,
         JsonDownloadTaskLoader.DownloadTaskLoaderCallbacks{
 
     private static final String TAG = MainActivity.class.getSimpleName();
     public static final String LOADER_BUNDLE_URL_KEY="the-url-key";
     public static final int LOADER_JSON_DOWNLOAD_KEY=1000;
-    private static final int SPAN_COUNT = 2;
+    public static final int LOADER_CURSOR_LOADER_KEY = 2000;
+
+
+    private boolean isDisplayingFavorites;
 
     private List<Movie> moviesList;
 
@@ -72,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements
         getSupportLoaderManager().initLoader(LOADER_JSON_DOWNLOAD_KEY,bundle,this);
 
 
+
         refreshBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -81,33 +85,6 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-//        StorageUtils.insertFakeData(this);
-        Uri uri = MovieDbContract.MovieFavoriteEntry.FAVORITE_CONTENT_URI;
-        uri = uri.buildUpon().appendPath("3").build();
-        Cursor cursor = getContentResolver().query(uri,null,null,null,
-                null);
-
-        while(cursor.moveToNext()){
-            long movieId=cursor.getLong
-                    (cursor.getColumnIndex(MovieDbContract.MovieFavoriteEntry.COLUMN_MOVIE_ID));
-            String name = cursor.getString(
-                    cursor.getColumnIndex(MovieDbContract.MovieFavoriteEntry.COLUMN_MOVIE_NAME));
-
-            String poster = cursor.getString(
-                    cursor.getColumnIndex(MovieDbContract.MovieFavoriteEntry.COLUMN_MOVIE_POSTER_LINK));
-            long rating = cursor.getLong(
-                    cursor.getColumnIndex(MovieDbContract.MovieFavoriteEntry.COLUMN_RATING));
-            String date = cursor.getString(
-                    cursor.getColumnIndex(MovieDbContract.MovieFavoriteEntry.COLUMN_RELEASE_DATE));
-            String synopsis = cursor.getString(
-                    cursor.getColumnIndex(MovieDbContract.MovieFavoriteEntry.COLUMN_SYNOPSIS));
-            Movie m = new Movie((int)movieId,poster,name,synopsis,(int)rating,date);
-            Log.d(TAG, m.toString());
-
-        }
-
-
-        Log.d(TAG,"Cursor count is"+cursor.getCount());
     }
 
 
@@ -120,6 +97,14 @@ public class MainActivity extends AppCompatActivity implements
 
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if(isDisplayingFavorites){
+            getSupportLoaderManager().restartLoader(LOADER_CURSOR_LOADER_KEY,null,this);
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         Bundle bundle = new Bundle();
@@ -127,11 +112,16 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.sort_popular_btn:
                 bundle.putInt(LOADER_BUNDLE_URL_KEY,MovieDbNetworkUtils.POPULAR_MOVIES);
                 getSupportLoaderManager().restartLoader(LOADER_JSON_DOWNLOAD_KEY,bundle,this);
+
                 break;
             case R.id.sort_toprated_btn:
                 bundle.putInt(LOADER_BUNDLE_URL_KEY,MovieDbNetworkUtils.TOP_RATED_MOVIES);
                 getSupportLoaderManager().restartLoader(LOADER_JSON_DOWNLOAD_KEY,bundle,this);
+
                 break;
+            case R.id.sort_favorite_btn:
+                getSupportLoaderManager().restartLoader(LOADER_CURSOR_LOADER_KEY,null,this);
+
             default:
                 return super.onOptionsItemSelected(item);
 
@@ -141,18 +131,32 @@ public class MainActivity extends AppCompatActivity implements
 
 
     @Override
-    public void onPosterClick(Movie movieClicked) {
+    public void onPosterClick(Movie movieClicked,boolean isCursorData) {
+
         Intent intent = new Intent(MainActivity.this,DetailsActivity.class);
-        intent.putExtra("movieObj",movieClicked);
+        intent.putExtra(DetailsActivity.MOVIE_IS_CURSOR_DATA_KEY,isCursorData);
+        if(!isCursorData){
+            intent.putExtra(DetailsActivity.MOVIE_OBJECT_TRANSFER_KEY,movieClicked);
+        }
+        else{
+            intent.putExtra(DetailsActivity.MOVIE_STORED_ID_KEY,movieClicked.getId());
+        }
         startActivity(intent);
 
     }
 
     @Override
-    public Loader<String> onCreateLoader(int id, Bundle args) {
+    public Loader onCreateLoader(int id, Bundle args) {
         switch (id){
             case LOADER_JSON_DOWNLOAD_KEY:
                 return new JsonDownloadTaskLoader(this,args.getInt(LOADER_BUNDLE_URL_KEY),this);
+            case LOADER_CURSOR_LOADER_KEY:
+                return new CursorLoader(this,
+                        MovieDbContract.MovieFavoriteEntry.FAVORITE_CONTENT_URI,
+                        PopularMovieUtils.cursorLoaderProjection,
+                        null,
+                        null,
+                        null);
         }
         return null;
     }
@@ -174,34 +178,64 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onLoadFinished(Loader<String> loader, String data) {
-
-        if(data!=null){
-            try {
-                moviesList = PopularMovieUtils.getMoviesListFromJson(data);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            hideErrorMessage();
-            theAdapter = new PopularAdapter(moviesList,MainActivity.this);
-            gridRecyclerView.setAdapter(theAdapter);
+    public void onLoadFinished(Loader<Object> loader, Object data) {
+        int id = loader.getId();
+        switch (id) {
+            case LOADER_JSON_DOWNLOAD_KEY:
+                String theData = (String)data;
+                displayJsonData(theData);
+                break;
+            case LOADER_CURSOR_LOADER_KEY:
+                Cursor cursor = (Cursor) data;
+                displayCursorData(cursor);
+                break;
         }
-        else{
-            displayErrorMessage();
-        }
-
-        hideProgressBar();
-        Log.d(TAG,"Called Hide ");
-
-
     }
 
 
     @Override
-    public void onLoaderReset(Loader<String> loader) {
-
+    public void onLoaderReset(Loader<Object> loader) {
+        updateRecyclerView(null,true);
     }
 
+    private void displayJsonData(String theData){
+        if (theData != null) {
+            try {
+                moviesList = PopularMovieUtils.getMoviesListFromJson(theData);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            hideErrorMessage();
+            updateRecyclerView(moviesList,false);
+        } else {
+            displayErrorMessage();
+        }
+
+        hideProgressBar();
+        Log.d(TAG, "Called Hide ");
+        isDisplayingFavorites = false;
+    }
+
+    private void displayCursorData(Cursor data) {
+        if(data.getCount()<=0){
+            /* TODO: Show empty cursor display */
+            return;
+        }
+
+        moviesList = PopularMovieUtils.getMovieListFromCursor(data);
+
+        updateRecyclerView(moviesList,true);
+        isDisplayingFavorites = true;
+    }
+
+    private void updateRecyclerView(List<Movie> moviesList, boolean isCursorData){
+        if (theAdapter == null) {
+            theAdapter = new PopularAdapter(moviesList, this,isCursorData);
+            gridRecyclerView.setAdapter(theAdapter);
+        } else {
+            theAdapter.swapData(moviesList,isCursorData);
+        }
+    }
 
     private int numberOfColumns() {
         DisplayMetrics displayMetrics = new DisplayMetrics();

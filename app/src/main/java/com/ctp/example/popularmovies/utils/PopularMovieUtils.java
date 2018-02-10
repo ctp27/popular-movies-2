@@ -1,6 +1,9 @@
 package com.ctp.example.popularmovies.utils;
 
+import android.database.Cursor;
+
 import com.ctp.example.popularmovies.Model.Movie;
+import com.ctp.example.popularmovies.provider.MovieDbContract;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,6 +18,23 @@ import java.util.List;
 
 public class PopularMovieUtils  {
 
+    public static final String TAG = PopularMovieUtils.class.getSimpleName();
+
+    public static final String[] cursorLoaderProjection = {
+            MovieDbContract.MovieFavoriteEntry.COLUMN_MOVIE_ID,
+            MovieDbContract.MovieFavoriteEntry.COLUMN_MOVIE_NAME,
+            MovieDbContract.MovieFavoriteEntry.COLUMN_MOVIE_POSTER_LINK,
+            MovieDbContract.MovieFavoriteEntry.COLUMN_RELEASE_DATE,
+            MovieDbContract.MovieFavoriteEntry.COLUMN_RATING,
+            MovieDbContract.MovieFavoriteEntry.COLUMN_SYNOPSIS
+    };
+
+    private static final int MOVIE_ID_INDEX = 0;
+    private static final int MOVIE_NAME_INDEX = 1;
+    private static final int MOVIE_POSTER_INDEX=2;
+    private static final int MOVIE_RELEASE_DATE_INDEX=3;
+    private static final int MOVIE_RATING_INDEX=4;
+    private static final int MOVIE_SYNOPSIS_INDEX = 5;
 
     private static final String IMG_BASE_URL="http://image.tmdb.org/t/p/w780";
 
@@ -54,6 +74,30 @@ public class PopularMovieUtils  {
     private static String buildImgUrl(String relativePath){
 
         return IMG_BASE_URL+relativePath;
+    }
+
+
+    public static List<Movie> getMovieListFromCursor(Cursor cursor){
+
+        List<Movie> listToSend = new ArrayList<>();
+
+        while(cursor.moveToNext()){
+
+            long movieId=cursor.getLong(MOVIE_ID_INDEX);
+            String name = cursor.getString(MOVIE_NAME_INDEX);
+
+            byte[] poster = cursor.getBlob(MOVIE_POSTER_INDEX);
+
+            long rating = cursor.getLong(MOVIE_RATING_INDEX);
+            String date = cursor.getString(MOVIE_RELEASE_DATE_INDEX);
+            String synopsis = cursor.getString(MOVIE_SYNOPSIS_INDEX);
+//            Log.d(TAG,new Movie((int)movieId,theBitmap,name,synopsis,(int)rating,date).toString());
+            listToSend.add(new Movie((int)movieId,poster,name,synopsis,(int)rating,date));
+
+        }
+
+        return listToSend;
+
     }
 
 }

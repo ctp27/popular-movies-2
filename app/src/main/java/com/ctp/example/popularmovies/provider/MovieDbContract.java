@@ -22,6 +22,10 @@ public class MovieDbContract {
         public static final Uri FAVORITE_CONTENT_URI = BASE_CONTENT_URI.buildUpon()
                                     .appendPath(PATH_FAVORITES).build();
 
+        public static Uri getUriForMovieId(int id){
+            return FAVORITE_CONTENT_URI.buildUpon().appendPath(Integer.toString(id)).build();
+        }
+
         public static final String TABLE_NAME = "favorites";
 
         public static final String COLUMN_MOVIE_ID = "movieId";

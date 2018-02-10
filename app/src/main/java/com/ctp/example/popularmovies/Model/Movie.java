@@ -25,6 +25,8 @@ public class Movie implements Serializable{
     /*  release date  */
     private String releaseDate;
 
+    private byte[] bitmap;
+
     public Movie(){}
 
     public Movie(int id, String thumbnailLink, String title, String synopsis,
@@ -36,6 +38,18 @@ public class Movie implements Serializable{
         this.userRating = userRating;
         this.releaseDate = releaseDate;
     }
+
+    public Movie(int id, byte[] bitmapImage, String title, String synopsis,
+                 int userRating, String releaseDate) {
+        this.id = id;
+        bitmap = bitmapImage;
+        this.title = title;
+        this.synopsis = synopsis;
+        this.userRating = userRating;
+        this.releaseDate = releaseDate;
+    }
+
+
 
     public int getId() {
         return id;
@@ -85,6 +99,13 @@ public class Movie implements Serializable{
         this.releaseDate = releaseDate;
     }
 
+    public byte[] getBitmap() {
+        return bitmap;
+    }
+
+    public void setBitmap(byte[] bitmap) {
+        this.bitmap = bitmap;
+    }
 
     @Override
     public String toString() {

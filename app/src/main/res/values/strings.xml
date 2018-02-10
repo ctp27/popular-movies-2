@@ -9,4 +9,6 @@
     <string name="refresh">Refresh</string>
     <string name="movie_poster">Movie Poster</string>
     <string name="synopsis">Synopsis</string>
+    <string name="menu_item_favorite_optn">Favorites</string>
+    <string name="tools_movie_name">Jumanji</string>
 </resources>

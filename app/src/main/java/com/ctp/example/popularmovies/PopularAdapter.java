@@ -1,6 +1,8 @@
 package com.ctp.example.popularmovies;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,15 +24,17 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.PopularA
     private List<Movie> movieList;
     private PopularAdapterClickListener theClickListener;
     Context context;
+    private boolean isCursorData;
 
-    public PopularAdapter(List<Movie> movieList, PopularAdapterClickListener theClickListener) {
+    public PopularAdapter(List<Movie> movieList, PopularAdapterClickListener theClickListener,boolean isCursorData) {
         this.movieList = movieList;
         this.theClickListener = theClickListener;
+        this.isCursorData = isCursorData;
     }
 
 
     public interface PopularAdapterClickListener{
-        void onPosterClick(Movie movieClicked);
+        void onPosterClick(Movie movieClicked,boolean isCursorData);
     }
 
 
@@ -52,16 +56,33 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.PopularA
     public void onBindViewHolder(PopularAdapterViewHolder holder, int position) {
 
         String path = movieList.get(position).getThumbnailLink();
-        Picasso.with(context).load(path)
-                .error(R.drawable.placeholder_img)
-                .placeholder(R.drawable.placeholder_img)
-                .into(holder.moviePoster);
+        if(isCursorData){
+            byte[] data = movieList.get(position).getBitmap();
+            Bitmap bitmap= BitmapFactory.decodeByteArray(data,0,data.length);
+            holder.moviePoster.setImageBitmap(bitmap);
+        }else {
+            Picasso.with(context).load(path)
+                    .error(R.drawable.placeholder_img)
+                    .placeholder(R.drawable.placeholder_img)
+                    .into(holder.moviePoster);
+        }
+
 
     }
 
     @Override
     public int getItemCount() {
         return movieList.size();
+    }
+
+
+    public void swapData(List<Movie> newMovieList, boolean isCursorData){
+        if(movieList!=null){
+            movieList = null;
+        }
+        movieList = newMovieList;
+        this.isCursorData = isCursorData;
+        notifyDataSetChanged();
     }
 
 
@@ -80,8 +101,7 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.PopularA
         @Override
         public void onClick(View view) {
             int position = getAdapterPosition();
-            theClickListener.onPosterClick(movieList.get(position));
-
+            theClickListener.onPosterClick(movieList.get(position),isCursorData);
         }
     }
 }
