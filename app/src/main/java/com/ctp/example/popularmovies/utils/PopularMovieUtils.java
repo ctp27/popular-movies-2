@@ -3,6 +3,8 @@ package com.ctp.example.popularmovies.utils;
 import android.database.Cursor;
 
 import com.ctp.example.popularmovies.Model.Movie;
+import com.ctp.example.popularmovies.Model.Review;
+import com.ctp.example.popularmovies.Model.Trailer;
 import com.ctp.example.popularmovies.provider.MovieDbContract;
 
 import org.json.JSONArray;
@@ -97,6 +99,66 @@ public class PopularMovieUtils  {
         }
 
         return listToSend;
+
+    }
+
+    public static List<Review> getReviewListFromJson(String jsonData) throws JSONException{
+
+        List<Review> theList = new ArrayList<>();
+
+        JSONObject mainObject = new JSONObject(jsonData);
+
+        JSONArray reviewResultsArray = mainObject.getJSONArray("results");
+
+        for(int i=0; i<reviewResultsArray.length(); i++){
+
+            JSONObject thisObject = reviewResultsArray.getJSONObject(i);
+
+            String id = thisObject.getString("id");
+
+            String author = thisObject.getString("author");
+
+            String content = thisObject.getString("content");
+
+            String url = thisObject.getString("url");
+
+            theList.add(new Review(id,author,content,url));
+
+        }
+
+        return theList;
+    }
+
+    public static List<Trailer> getTrailerListFromJson(String jsonData)
+                                throws JSONException{
+
+        List<Trailer> theList = new ArrayList<>();
+
+        JSONObject mainObject = new JSONObject(jsonData);
+
+        JSONArray reviewResultsArray = mainObject.getJSONArray("results");
+
+        for(int i=0; i<reviewResultsArray.length(); i++){
+
+            JSONObject thisObject = reviewResultsArray.getJSONObject(i);
+
+            String id = thisObject.getString("id");
+
+            String isoString = thisObject.getString("iso_639_1");
+
+            String key = thisObject.getString("key");
+
+            String name = thisObject.getString("name");
+
+            String site = thisObject.getString("site");
+
+            String type = thisObject.getString("type");
+
+            theList.add(new Trailer(id,isoString,key,name,site,type));
+
+        }
+
+        return theList;
 
     }
 

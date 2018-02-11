@@ -29,9 +29,15 @@ public class MovieDbNetworkUtils {
 
     private static final String BASE_URL = "https://api.themoviedb.org/3/movie";
 
-    private static final String popular = "popular";
-    private static final String topRated = "top_rated";
+    private static final String PATH_POPULAR = "popular";
+    private static final String PATH_TOP_RATED = "top_rated";
+    private static final String PATH_REVIEWS= "reviews";
+    private static final String PATH_TRAILERS = "videos";
+
     private static final String QUERY_API_KEY="api_key";
+    private static final String QUERY_LANGUAGE = "language";
+
+    private static final String QUERY_LANGUAGE_ENGLISH = "en-US";
 
 
     /**
@@ -43,11 +49,12 @@ public class MovieDbNetworkUtils {
     public static URL buildUrl(int sortType){
         String path = null;
 
+
         if(sortType==POPULAR_MOVIES){
-            path =popular;
+            path =PATH_POPULAR;
         }
         else {
-            path = topRated;
+            path = PATH_TOP_RATED;
         }
 
         Uri builtUri = Uri.parse(BASE_URL).buildUpon()
@@ -66,6 +73,51 @@ public class MovieDbNetworkUtils {
         return url;
     }
 
+
+    public static URL buildReviewsUrlForMovieId(int movieId){
+
+        String idToAppend = Integer.toString(movieId);
+
+        Uri buildUri = Uri.parse(BASE_URL).buildUpon()
+                        .appendPath(idToAppend)
+                        .appendPath(PATH_REVIEWS)
+                        .appendQueryParameter(QUERY_API_KEY,MOVIEDB_API_KEY)
+                        .appendQueryParameter(QUERY_LANGUAGE,QUERY_LANGUAGE_ENGLISH)
+                        .build();
+
+        URL url = null;
+        try{
+            url = new URL(buildUri.toString());
+        }catch (MalformedURLException e){
+            e.printStackTrace();
+        }
+        Log.d(TAG,"Built URL is "+url);
+        return url;
+    }
+
+    public static URL buildTrailersUrlForMovieId(int movieId){
+
+//       TODO: Build this method to return a URI for getting the trailers
+
+        String idToAppend = Integer.toString(movieId);
+
+        Uri buildUri = Uri.parse(BASE_URL).buildUpon()
+                .appendPath(idToAppend)
+                .appendPath(PATH_TRAILERS)
+                .appendQueryParameter(QUERY_API_KEY,MOVIEDB_API_KEY)
+                .appendQueryParameter(QUERY_LANGUAGE,QUERY_LANGUAGE_ENGLISH)
+                .build();
+
+        URL url = null;
+
+        try{
+            url = new URL(buildUri.toString());
+        }catch (MalformedURLException e){
+            e.printStackTrace();
+        }
+
+        return url;
+    }
 
     /**
      * Network method which connects to the internet using the URL passed as a parameter

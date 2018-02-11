@@ -17,12 +17,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ctp.example.popularmovies.AsyncTasks.ReviewJsonDownloadLoader;
+import com.ctp.example.popularmovies.AsyncTasks.TrailerJsonDownloadLoader;
 import com.ctp.example.popularmovies.Model.Movie;
+import com.ctp.example.popularmovies.Model.Review;
+import com.ctp.example.popularmovies.Model.Trailer;
 import com.ctp.example.popularmovies.provider.MovieDbContract;
 import com.ctp.example.popularmovies.services.DataPersistenceService;
 import com.ctp.example.popularmovies.utils.FavoritesUtils;
 import com.ctp.example.popularmovies.utils.PopularMovieUtils;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
 
 import java.util.List;
 
@@ -31,12 +37,19 @@ public class DetailsActivity extends AppCompatActivity
 
     private static final String TAG = DetailsActivity.class.getSimpleName();
 
+    private static final int CURSOR_LOADER_ALL_DETAILS_KEY = 111;
+    private static final int CURSOR_LOADER_CHECK_IF_FAVORITE_KEY = 112;
+    private static final int LOADER_GET_REVIEWS_KEY = 113;
+    private static final int LOADER_GET_TRAILERS_KEY = 114;
+
+
     public static final String MOVIE_OBJECT_TRANSFER_KEY="movie-tranfer-object";
     public static final String MOVIE_IS_CURSOR_DATA_KEY = "cursor-data-key";
     public static final String MOVIE_STORED_ID_KEY="stored-movie_id";
-    private static final int CURSOR_LOADER_ALL_DETAILS_KEY = 111;
-    private static final int CURSOR_LOADER_CHECK_IF_FAVORITE_KEY = 112;
-    private static final int LOADER_GET_REVIEWS_AND_TRAILERS = 113;
+
+
+    private static final String LOADER_BUNDLE_MOVIE_KEY="movie-id-key";
+
     private static final String INSTANCE_BOOLEAN_STATE_KEY = "booll";
 
 
@@ -73,10 +86,10 @@ public class DetailsActivity extends AppCompatActivity
     private void getMovieObjectFromSender() {
         Intent receivedIntent = getIntent();
         if(receivedIntent!=null){
-            Log.d(TAG,"Received intent is not null");
+
             if(receivedIntent.hasExtra(MOVIE_IS_CURSOR_DATA_KEY)){
                 isCursorData = receivedIntent.getBooleanExtra(MOVIE_IS_CURSOR_DATA_KEY,false);
-                Log.d(TAG,"isCursorData is "+isCursorData);
+
             }
 
             if(isCursorData){
@@ -85,12 +98,11 @@ public class DetailsActivity extends AppCompatActivity
                 Bundle bundle = new Bundle();
                 bundle.putInt(MOVIE_STORED_ID_KEY,movieId);
                 getSupportLoaderManager().restartLoader(CURSOR_LOADER_ALL_DETAILS_KEY,bundle,this);
-                Log.d(TAG,"Restarted Loader");
+
             }
             else{
                 movie = (Movie) receivedIntent.getSerializableExtra(MOVIE_OBJECT_TRANSFER_KEY);
                 displayDataFromMovieObject();
-                Log.d(TAG,"Displaying from object movie "+movie.getTitle());
 //               TODO: Call method to initialize the data
             }
         }
@@ -141,10 +153,19 @@ public class DetailsActivity extends AppCompatActivity
                 return new CursorLoader(this,
                         uri, PopularMovieUtils.cursorLoaderProjection,
                         null,null,null);
+
             case CURSOR_LOADER_CHECK_IF_FAVORITE_KEY:
                 return new CursorLoader(this,
                         uri, new String[]{MovieDbContract.MovieFavoriteEntry.COLUMN_MOVIE_ID},
                         null,null,null);
+
+            case LOADER_GET_REVIEWS_KEY:
+                int movieId = args.getInt(LOADER_BUNDLE_MOVIE_KEY);
+                return new ReviewJsonDownloadLoader(this,movieId);
+
+            case LOADER_GET_TRAILERS_KEY:
+                int movId = args.getInt(LOADER_BUNDLE_MOVIE_KEY);
+                return new TrailerJsonDownloadLoader(this,movId);
         }
         return null;
     }
@@ -162,6 +183,14 @@ public class DetailsActivity extends AppCompatActivity
             case CURSOR_LOADER_CHECK_IF_FAVORITE_KEY:
                 Cursor theCursor = (Cursor)data;
                 setTheFavoritesButton(theCursor);
+                break;
+            case LOADER_GET_REVIEWS_KEY:
+                String reviewData = (String)data;
+                displayReviewData(reviewData);
+                break;
+            case LOADER_GET_TRAILERS_KEY:
+                String trailerData = (String)data;
+                displayTrailerData(trailerData);
                 break;
         }
     }
@@ -197,7 +226,9 @@ public class DetailsActivity extends AppCompatActivity
         synopsis.setText(movie.getSynopsis());
         isAddedToFavorites = true;
         highlightFavoriteButtonBasedOnBoolean(isAddedToFavorites);
+        executeTrailerAndReviewLoaders(movie.getId());
         //TODO: start task to get Movies and reviews. Create a method
+
     }
 
     private void displayDataFromMovieObject(){
@@ -215,6 +246,47 @@ public class DetailsActivity extends AppCompatActivity
         Bundle bundle = new Bundle();
         bundle.putInt(MOVIE_STORED_ID_KEY,movie.getId());
         getSupportLoaderManager().restartLoader(CURSOR_LOADER_CHECK_IF_FAVORITE_KEY,bundle,this);
+        executeTrailerAndReviewLoaders(movie.getId());
+    }
+
+    private void displayReviewData(String reviewData){
+        if(reviewData==null){
+            Log.d(TAG,"String is null");
+            return;
+        }
+
+        List<Review> reviewsList=null;
+
+        try {
+           reviewsList =  PopularMovieUtils.getReviewListFromJson(reviewData);
+        }
+        catch (JSONException e){
+            e.printStackTrace();
+        }
+
+        for(Review r: reviewsList){
+            Log.d(TAG, r.toString());
+        }
+
+    }
+
+    private void displayTrailerData(String trailerData){
+
+        if(trailerData ==null){
+            return;
+        }
+
+        List<Trailer> trailers = null;
+
+        try{
+            trailers = PopularMovieUtils.getTrailerListFromJson(trailerData);
+        }catch (JSONException e){
+
+        }
+
+        for(Trailer t : trailers){
+            Log.d(TAG,t.toString());
+        }
     }
 
 
@@ -240,6 +312,16 @@ public class DetailsActivity extends AppCompatActivity
             favoriteBtn.setImageResource(R.drawable.ic_love_heart_svg);
         else
             favoriteBtn.setImageResource(R.drawable.ic_love_heart_svg_white);
+    }
+
+
+    private void executeTrailerAndReviewLoaders(int movieId){
+        Bundle bundle = new Bundle();
+        bundle.putInt(LOADER_BUNDLE_MOVIE_KEY,movieId);
+        getSupportLoaderManager().restartLoader(LOADER_GET_REVIEWS_KEY,
+                bundle,this);
+        getSupportLoaderManager().restartLoader(LOADER_GET_TRAILERS_KEY,
+                bundle,this);
     }
 }
 
