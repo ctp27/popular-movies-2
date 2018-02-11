@@ -1,5 +1,6 @@
 package com.ctp.example.popularmovies;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -7,10 +8,15 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.ShareCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -22,6 +28,8 @@ import com.ctp.example.popularmovies.AsyncTasks.TrailerJsonDownloadLoader;
 import com.ctp.example.popularmovies.Model.Movie;
 import com.ctp.example.popularmovies.Model.Review;
 import com.ctp.example.popularmovies.Model.Trailer;
+import com.ctp.example.popularmovies.adapters.ReviewAdapter;
+import com.ctp.example.popularmovies.adapters.TrailerAdapter;
 import com.ctp.example.popularmovies.provider.MovieDbContract;
 import com.ctp.example.popularmovies.services.DataPersistenceService;
 import com.ctp.example.popularmovies.utils.FavoritesUtils;
@@ -33,7 +41,8 @@ import org.json.JSONException;
 import java.util.List;
 
 public class DetailsActivity extends AppCompatActivity
-                    implements LoaderManager.LoaderCallbacks<Object>{
+                    implements LoaderManager.LoaderCallbacks<Object>,
+                    TrailerAdapter.TrailerListClickCallback{
 
     private static final String TAG = DetailsActivity.class.getSimpleName();
 
@@ -42,10 +51,14 @@ public class DetailsActivity extends AppCompatActivity
     private static final int LOADER_GET_REVIEWS_KEY = 113;
     private static final int LOADER_GET_TRAILERS_KEY = 114;
 
+    private static final String YOUTUBE_APP_BASE_URI = "vnd.youtube:";
+    private static final String WEB_BROWSER_BASE_URI = "http://www.youtube.com/watch?v=";
+
 
     public static final String MOVIE_OBJECT_TRANSFER_KEY="movie-tranfer-object";
     public static final String MOVIE_IS_CURSOR_DATA_KEY = "cursor-data-key";
     public static final String MOVIE_STORED_ID_KEY="stored-movie_id";
+
 
 
     private static final String LOADER_BUNDLE_MOVIE_KEY="movie-id-key";
@@ -63,6 +76,14 @@ public class DetailsActivity extends AppCompatActivity
     private Movie movie;
     private Toast theToast;
 
+    private RecyclerView trailerListView;
+    private RecyclerView reviewListView;
+
+    private ReviewAdapter reviewAdapter;
+    private TrailerAdapter trailerAdapter;
+
+    private Trailer firstTrailer;
+
     private boolean isAddedToFavorites;
     private boolean isCursorData;
 
@@ -78,6 +99,14 @@ public class DetailsActivity extends AppCompatActivity
         releaseDate = findViewById(R.id.details_release_date);
         userRating = findViewById(R.id.details_user_rating);
         favoriteBtn = findViewById(R.id.add_to_fav_btn);
+        trailerListView = findViewById(R.id.details_trailer_list);
+        reviewListView = findViewById(R.id.details_review_list);
+        LinearLayoutManager manager1 = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
+        LinearLayoutManager manager2 = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
+        trailerListView.setLayoutManager(manager1);
+        reviewListView.setLayoutManager(manager2);
+        trailerListView.setHasFixedSize(true);
+        reviewListView.setHasFixedSize(true);
 
         getMovieObjectFromSender();
     }
@@ -115,31 +144,22 @@ public class DetailsActivity extends AppCompatActivity
 
     }
 
-    public void addToFavorites(View view){
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.details_activity_menu,menu);
+        return true;
+    }
 
-        if(isAddedToFavorites) {
-            highlightFavoriteButtonBasedOnBoolean(false);
-            Intent intent = new Intent(this,DataPersistenceService.class);
-            movie.setBitmap(null);
-            intent.putExtra(FavoritesUtils.FAVORITES_SERIALIZABLE_KEY,movie);
-            intent.setAction(FavoritesUtils.ACTION_DELETE_FROM_FAVORITES);
-            startService(intent);
-            isAddedToFavorites = false;
-            showRemovingFromFavoriteToast();
-            if(isCursorData){
-                finish();
-            }
-        }
-        else{
-            highlightFavoriteButtonBasedOnBoolean(true);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
 
-            Intent intent = new Intent(this, DataPersistenceService.class);
-            intent.putExtra(FavoritesUtils.FAVORITES_SERIALIZABLE_KEY,movie);
-            intent.setAction(FavoritesUtils.ACTION_ADD_TO_FAVORITES);
-            startService(intent);
+        switch (item.getItemId()){
 
-            isAddedToFavorites = true;
-            showAddingToFavoriteToast();
+            case R.id.share_btn:
+                shareMovieTrailer();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
@@ -264,8 +284,12 @@ public class DetailsActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
-        for(Review r: reviewsList){
-            Log.d(TAG, r.toString());
+        if(!reviewsList.isEmpty()){
+            reviewAdapter = new ReviewAdapter(reviewsList);
+            reviewListView.setAdapter(reviewAdapter);
+
+        }else {
+            Log.d(TAG,"reviews is empty");
         }
 
     }
@@ -273,6 +297,7 @@ public class DetailsActivity extends AppCompatActivity
     private void displayTrailerData(String trailerData){
 
         if(trailerData ==null){
+            Log.d(TAG,"Trailerlist is null");
             return;
         }
 
@@ -284,9 +309,77 @@ public class DetailsActivity extends AppCompatActivity
 
         }
 
-        for(Trailer t : trailers){
-            Log.d(TAG,t.toString());
+        if(!trailers.isEmpty()){
+            trailerAdapter = new TrailerAdapter(trailers,this,movie.getTitle());
+            trailerListView.setAdapter(trailerAdapter);
+            firstTrailer = trailers.get(0);
+            Log.d(TAG,"Trailerlist is set");
         }
+        else{
+            //TODO: show no trailers available
+            Log.d(TAG,"Trailerlist is empty");
+        }
+    }
+
+    public void addToFavorites(View view){
+
+        if(isAddedToFavorites) {
+            highlightFavoriteButtonBasedOnBoolean(false);
+            Intent intent = new Intent(this,DataPersistenceService.class);
+            movie.setBitmap(null);
+            intent.putExtra(FavoritesUtils.FAVORITES_SERIALIZABLE_KEY,movie);
+            intent.setAction(FavoritesUtils.ACTION_DELETE_FROM_FAVORITES);
+            startService(intent);
+            isAddedToFavorites = false;
+            showRemovingFromFavoriteToast();
+            if(isCursorData){
+                finish();
+            }
+        }
+        else{
+            highlightFavoriteButtonBasedOnBoolean(true);
+
+            Intent intent = new Intent(this, DataPersistenceService.class);
+            intent.putExtra(FavoritesUtils.FAVORITES_SERIALIZABLE_KEY,movie);
+            intent.setAction(FavoritesUtils.ACTION_ADD_TO_FAVORITES);
+            startService(intent);
+
+            isAddedToFavorites = true;
+            showAddingToFavoriteToast();
+        }
+    }
+
+    @Override
+    public void onTrailerClicked(Trailer t) {
+
+        Uri youtubeAppUri = Uri.parse(YOUTUBE_APP_BASE_URI+t.getKey());
+        Intent appIntent = new Intent(Intent.ACTION_VIEW, youtubeAppUri);
+        Intent webIntent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse(WEB_BROWSER_BASE_URI + t.getKey()));
+        try {
+            startActivity(appIntent);
+        } catch (ActivityNotFoundException ex) {
+            startActivity(webIntent);
+        }
+
+    }
+
+    private void shareMovieTrailer(){
+
+        if(firstTrailer==null)
+            return;
+
+
+        String mimeType = "text/plain";
+        String title = movie.getTitle() +" - "+ firstTrailer.getName();
+        String content = "Check out the trailer of "+movie.getTitle()+".\n"+
+                WEB_BROWSER_BASE_URI+firstTrailer.getKey();
+
+        ShareCompat.IntentBuilder
+                .from(this).setType(mimeType)
+                .setChooserTitle(title)
+                .setText(content)
+                .startChooser();
     }
 
 

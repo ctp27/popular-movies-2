@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <ImageView
+        android:id="@+id/account_symbol"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_account_circle_white_24dp" />
+
+    <TextView
+        android:id="@+id/review_list_reviewer_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        tools:text="Chandler Bing"
+        app:layout_constraintBottom_toBottomOf="@+id/account_symbol"
+        app:layout_constraintStart_toEndOf="@+id/account_symbol"
+        app:layout_constraintTop_toTopOf="@+id/account_symbol"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        style="@style/detailsTextStyke"/>
+
+    <TextView
+        android:id="@+id/review_list_content"
+        style="@style/detailsTextStyke"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/account_symbol"
+        app:layout_constraintTop_toBottomOf="@+id/account_symbol"
+        tools:text="Could this movie BE more awesome?" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorWhite"/>
+
+
+</android.support.constraint.ConstraintLayout>

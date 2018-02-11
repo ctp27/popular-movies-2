@@ -1,54 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android" >
-<android.support.constraint.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android" >
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="8000dp">
 
 
     <ImageView
         android:id="@+id/details_movie_poster"
         android:layout_width="150dp"
         android:layout_height="200dp"
-        android:layout_marginStart="12dp"
         android:layout_marginLeft="12dp"
+        android:layout_marginStart="12dp"
         android:layout_marginTop="23dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@color/colorPrimary"
         android:adjustViewBounds="true"
         android:scaleType="fitXY"
-        />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@color/colorPrimary" />
 
     <TextView
         android:id="@+id/details_movie_title"
+        style="@style/detailsTextStyke"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:layout_marginStart="23dp"
-        android:layout_marginRight="8dp"
         android:layout_marginLeft="23dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="23dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/details_movie_poster"
         app:layout_constraintTop_toTopOf="@+id/details_movie_poster"
-        tools:text="Jumanji"
-        style="@style/detailsTextStyke"/>
+        tools:text="Jumanji" />
 
     <TextView
         android:id="@+id/details_release_date"
+        style="@style/detailsTextStyke"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        tools:text="26th January 2018"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
         app:layout_constraintStart_toStartOf="@+id/details_movie_title"
         app:layout_constraintTop_toBottomOf="@+id/details_movie_title"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-        style="@style/detailsTextStyke"/>
+        tools:text="26th January 2018" />
 
     <TextView
         android:id="@+id/details_user_rating"
@@ -69,14 +70,14 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:background="@color/colorPrimaryDark"
-        android:padding="5dp"
-        app:srcCompat="@drawable/ic_love_heart_svg_white"
-        android:textSize="12sp"
         android:onClick="addToFavorites"
+        android:padding="5dp"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@+id/details_user_rating"
         app:layout_constraintEnd_toEndOf="@+id/details_movie_title"
         app:layout_constraintStart_toStartOf="@+id/details_movie_title"
-        app:layout_constraintTop_toTopOf="@+id/details_user_rating" />
+        app:layout_constraintTop_toTopOf="@+id/details_user_rating"
+        app:srcCompat="@drawable/ic_love_heart_svg_white" />
 
     <TextView
         android:id="@+id/details_synopsis_label"
@@ -95,11 +96,9 @@
         style="@style/detailsTextStyke"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/details_synopsis_label"
         app:layout_constraintTop_toBottomOf="@+id/details_synopsis_label"
@@ -116,6 +115,54 @@
         app:layout_constraintStart_toStartOf="@+id/details_movie_poster"
         app:layout_constraintTop_toBottomOf="@+id/details_movie_poster"
         app:srcCompat="@drawable/ic_star_black_24dp" />
+
+    <TextView
+        android:id="@+id/details_trailers_label"
+        style="@style/detailsTextStyke"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="23dp"
+        android:text="Trailers"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/details_synopsis"
+        app:layout_constraintTop_toBottomOf="@+id/details_synopsis" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/details_trailer_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/details_trailers_label"
+        app:layout_constraintTop_toBottomOf="@+id/details_trailers_label" />
+
+    <TextView
+        android:id="@+id/details_review_label"
+        style="@style/detailsTextStyke"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="23dp"
+        android:text="Reviews"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/details_trailers_label"
+        app:layout_constraintTop_toBottomOf="@+id/details_trailer_list" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/details_review_list"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/details_review_label"
+        app:layout_constraintTop_toBottomOf="@+id/details_review_label" />
+
+
 
 
 </android.support.constraint.ConstraintLayout>

@@ -136,25 +136,31 @@ public class PopularMovieUtils  {
 
         JSONObject mainObject = new JSONObject(jsonData);
 
-        JSONArray reviewResultsArray = mainObject.getJSONArray("results");
+        JSONArray trailerResultsArray = mainObject.getJSONArray("results");
 
-        for(int i=0; i<reviewResultsArray.length(); i++){
 
-            JSONObject thisObject = reviewResultsArray.getJSONObject(i);
+        for(int i=0; i<trailerResultsArray.length(); i++){
 
-            String id = thisObject.getString("id");
-
-            String isoString = thisObject.getString("iso_639_1");
-
-            String key = thisObject.getString("key");
-
-            String name = thisObject.getString("name");
-
-            String site = thisObject.getString("site");
+            JSONObject thisObject = trailerResultsArray.getJSONObject(i);
 
             String type = thisObject.getString("type");
 
-            theList.add(new Trailer(id,isoString,key,name,site,type));
+            if(type.equalsIgnoreCase("Trailer") ||
+                    type.equalsIgnoreCase("Teaser")) {
+
+                String id = thisObject.getString("id");
+
+                String isoString = thisObject.getString("iso_639_1");
+
+                String key = thisObject.getString("key");
+
+                String name = thisObject.getString("name");
+
+                String site = thisObject.getString("site");
+
+
+                theList.add(new Trailer(id, isoString, key, name, site, type));
+            }
 
         }
 
