@@ -35,9 +35,9 @@ public class MainActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Object>{
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    public static final String LOADER_BUNDLE_URL_KEY="the-url-key";
-    public static final int LOADER_JSON_DOWNLOAD_KEY=1000;
-    public static final int LOADER_CURSOR_LOADER_KEY = 2000;
+    private static final String LOADER_BUNDLE_URL_KEY="the-url-key";
+    private static final int LOADER_JSON_DOWNLOAD_KEY=1000;
+    private static final int LOADER_CURSOR_LOADER_KEY = 2000;
 
     private static final String BUNDLE_SAVE_FAV_STATE_KEY="fav_state_jet";
 
@@ -213,7 +213,6 @@ public class MainActivity extends AppCompatActivity implements
         if (isErrorMessageDisplayed) {
             hideErrorMessage();
         }
-
         displayProgressBar();
     }
 
@@ -301,7 +300,7 @@ public class MainActivity extends AppCompatActivity implements
         isErrorMessageDisplayed = true;
     }
 
-    public void hideErrorMessage(){
+    private void hideErrorMessage(){
 
         errorMessage.setVisibility(View.INVISIBLE);
         refreshBtn.setVisibility(View.INVISIBLE);

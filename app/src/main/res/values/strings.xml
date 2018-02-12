@@ -3,9 +3,6 @@
     <string name="pop_menu_item">Popular</string>
     <string name="toprated_menu_item">Top Rated</string>
     <string name="err_msg">Whoops! There was an error fetching the data. Check your internet connection and try aggain</string>
-    <string name="details_usr_rating">User Rating : </string>
-    <string name="details_mov_title">Movie Title</string>
-    <string name="details_rel_date">Released on </string>
     <string name="refresh">Refresh</string>
     <string name="movie_poster">Movie Poster</string>
     <string name="synopsis">Synopsis</string>
@@ -29,4 +26,7 @@
     <string name="added_to_fav_toast">Added to Favorites</string>
     <string name="rem_from_fav_toast">Removed from Favorites</string>
     <string name="share_movie_text">Check out the trailer of</string>
+    <string name="rating_star_contentdesc">Rating star image</string>
+    <string name="review_account_img_contentdesc">Author account icon</string>
+    <string name="trailer_list_img_contentdesc">Play Trailer icon</string>
 </resources>

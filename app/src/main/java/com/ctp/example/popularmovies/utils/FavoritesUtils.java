@@ -2,7 +2,6 @@ package com.ctp.example.popularmovies.utils;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
@@ -35,16 +34,9 @@ public class FavoritesUtils {
 
     }
 
-    public static Cursor getData(Context context){
-        Cursor cursor = context.getContentResolver().query(MovieDbContract.MovieFavoriteEntry.FAVORITE_CONTENT_URI,
-                null,null,null,null);
-
-        return cursor;
-
-    }
 
 
-    public static void addMovieToFavorites(Movie m, Context context){
+    private static void addMovieToFavorites(Movie m, Context context){
 
         Bitmap img = downloadImageBitmap(m.getThumbnailLink());
         byte[] data = getBitmapAsByteArray(img); // this is a function
@@ -57,7 +49,7 @@ public class FavoritesUtils {
 
     }
 
-    public static void removeFromFavorites(Movie m, Context context){
+    private static void removeFromFavorites(Movie m, Context context){
 
         context.getContentResolver().delete(MovieDbContract.MovieFavoriteEntry.FAVORITE_CONTENT_URI,
                 MovieDbContract.MovieFavoriteEntry.COLUMN_MOVIE_ID+" = ?",new String[]{m.getId()+""});

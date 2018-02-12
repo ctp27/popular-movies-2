@@ -17,7 +17,7 @@ import java.net.URL;
 public class JsonDownloadTaskLoader extends AsyncTaskLoader<String> {
 
     private String theJsonData;
-    int sortOrder;
+    private int sortOrder;
 
 
 
@@ -60,7 +60,6 @@ public class JsonDownloadTaskLoader extends AsyncTaskLoader<String> {
 
 
     private URL getUrlForSort(int sortType) {
-        URL url = MovieDbNetworkUtils.buildUrl(sortType);
-        return url;
+        return MovieDbNetworkUtils.buildUrl(sortType);
     }
 }
