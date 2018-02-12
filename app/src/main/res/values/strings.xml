@@ -12,4 +12,21 @@
     <string name="menu_item_favorite_optn">Favorites</string>
     <string name="tools_movie_name">Jumanji</string>
     <string name="share_btn_title">Share</string>
+    <string name="no_trailers_text_view">No trailers are available for this movie</string>
+    <string name="no_reviews_text">No reviews available for this movie</string>
+    <string name="imageUrl">http://image.tmdb.org/t/p/w500</string>
+    <string name="width_divider">500</string>
+    <string name="favorites_empty_msg">You currently do not have any favorites. Add a movie as your favorite!</string>
+    <string name="details_review_label_string">Reviews</string>
+    <string name="details_trailers_label_string">Trailers</string>
+    <string name="details_synopsis_label_string">Synopsis</string>
+    <string name="details_movie_poster_contentdesc">Movie Poster</string>
+    <string name="details_movie_title_tooltext">Jumanji</string>
+    <string name="details_release_date_toolstext">26th January 2018</string>
+    <string name="details_user_rating_toolstext">8/10</string>
+    <string name="add_to_fav_btn_contentdesc">Add favorite button</string>
+    <string name="details_synopsis_toolstext">This movie is about two thre axasdsadas dasdasd asdasdasd asdasdasd</string>
+    <string name="added_to_fav_toast">Added to Favorites</string>
+    <string name="rem_from_fav_toast">Removed from Favorites</string>
+    <string name="share_movie_text">Check out the trailer of</string>
 </resources>

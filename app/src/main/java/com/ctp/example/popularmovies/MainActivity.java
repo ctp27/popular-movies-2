@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ctp.example.popularmovies.AsyncTasks.JsonDownloadTaskLoader;
 import com.ctp.example.popularmovies.Model.Movie;
@@ -39,6 +40,8 @@ public class MainActivity extends AppCompatActivity implements
     public static final int LOADER_CURSOR_LOADER_KEY = 2000;
 
     private static final String BUNDLE_SAVE_FAV_STATE_KEY="fav_state_jet";
+
+    private static int WIDTH_DIVIDER = 0;
 
 
     private boolean isDisplayingFavorites;
@@ -65,6 +68,8 @@ public class MainActivity extends AppCompatActivity implements
         progressBar =  findViewById(R.id.loading_indicator);
         errorMessage = findViewById(R.id.error_message_display);
         refreshBtn = findViewById(R.id.refresh_btn);
+        WIDTH_DIVIDER = Integer.parseInt(getString(R.string.width_divider));
+
 
         LinearLayoutManager theManager = new GridLayoutManager(this,numberOfColumns());
 
@@ -164,10 +169,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public Loader onCreateLoader(int id, Bundle args) {
-        if (isErrorMessageDisplayed) {
-            hideErrorMessage();
-           }
-            displayProgressBar();
+            preLoadChecks();
             switch (id) {
                 case LOADER_JSON_DOWNLOAD_KEY:
                     return new JsonDownloadTaskLoader(this, args.getInt(LOADER_BUNDLE_URL_KEY));
@@ -207,7 +209,13 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
+    private void preLoadChecks(){
+        if (isErrorMessageDisplayed) {
+            hideErrorMessage();
+        }
 
+        displayProgressBar();
+    }
 
     private void displayJsonData(String theData){
         if (theData != null) {
@@ -233,7 +241,13 @@ public class MainActivity extends AppCompatActivity implements
 
     private void displayCursorData(Cursor data) {
         if(data.getCount()<=0){
-            /* TODO: Show empty cursor display */
+            Toast.makeText(this,getString(R.string.favorites_empty_msg),Toast.LENGTH_LONG).show();
+            hideProgressBar();
+            if(isDisplayingFavorites){
+                Bundle bundle = new Bundle();
+                bundle.putInt(LOADER_BUNDLE_URL_KEY,MovieDbNetworkUtils.POPULAR_MOVIES);
+                getSupportLoaderManager().restartLoader(LOADER_JSON_DOWNLOAD_KEY,bundle,this);
+            }
             return;
         }
 

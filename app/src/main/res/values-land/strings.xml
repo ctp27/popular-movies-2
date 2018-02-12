@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Popular Movies</string>
+    <string name="pop_menu_item">Popular</string>
+    <string name="toprated_menu_item">Top Rated</string>
+    <string name="err_msg">Whoops! There was an error fetching the data. Check your internet connection and try aggain</string>
+    <string name="details_usr_rating">User Rating : </string>
+    <string name="details_mov_title">Movie Title</string>
+    <string name="details_rel_date">Released on </string>
+    <string name="refresh">Refresh</string>
+    <string name="movie_poster">Movie Poster</string>
+    <string name="synopsis">Synopsis</string>
+    <string name="menu_item_favorite_optn">Favorites</string>
+    <string name="tools_movie_name">Jumanji</string>
+    <string name="share_btn_title">Share</string>
+    <string name="no_trailers_text_view">No trailers are available for this movie</string>
+    <string name="no_reviews_text">No reviews available for this movie</string>
+    <string name="imageUrl">http://image.tmdb.org/t/p/w780</string>
+    <string name="width_divider">780</string>
+</resources>

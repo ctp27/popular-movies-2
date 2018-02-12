@@ -32,9 +32,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:layout_marginLeft="23dp"
+            android:layout_marginLeft="32dp"
             android:layout_marginRight="8dp"
-            android:layout_marginStart="23dp"
+            android:layout_marginStart="32dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
@@ -59,28 +59,27 @@
             style="@style/detailsTextStyke"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="100dp"
+            android:layout_marginRight="100dp"
             android:layout_marginTop="8dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-            app:layout_constraintEnd_toEndOf="@+id/rating_star"
-            app:layout_constraintStart_toStartOf="@+id/rating_star"
-            app:layout_constraintTop_toBottomOf="@+id/rating_star"
+            app:layout_constraintBottom_toBottomOf="@+id/add_to_fav_btn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/add_to_fav_btn"
             tools:text="@string/details_user_rating_toolstext" />
 
         <ImageButton
             android:id="@+id/add_to_fav_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:contentDescription="@string/add_to_fav_btn_contentdesc"
-            android:layout_marginStart="8dp"
+            android:layout_marginTop="40dp"
             android:background="@color/colorPrimaryDark"
+            android:contentDescription="@string/add_to_fav_btn_contentdesc"
             android:onClick="addToFavorites"
             android:padding="5dp"
             android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="@+id/details_user_rating"
-            app:layout_constraintEnd_toEndOf="@+id/details_movie_title"
-            app:layout_constraintStart_toStartOf="@+id/details_movie_title"
-            app:layout_constraintTop_toTopOf="@+id/details_user_rating"
+            app:layout_constraintStart_toStartOf="@+id/details_release_date"
+            app:layout_constraintTop_toBottomOf="@+id/details_release_date"
             app:srcCompat="@drawable/ic_love_heart_svg_white" />
 
         <TextView
@@ -88,12 +87,14 @@
             style="@style/detailsTextStyke"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginLeft="4dp"
             android:layout_marginTop="8dp"
             android:text="@string/details_synopsis_label_string"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@+id/details_movie_poster"
-            app:layout_constraintTop_toBottomOf="@+id/details_user_rating" />
+            app:layout_constraintTop_toBottomOf="@+id/details_movie_poster" />
 
         <TextView
             android:id="@+id/details_synopsis"
@@ -112,12 +113,12 @@
             android:id="@+id/rating_star"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintEnd_toEndOf="@+id/details_movie_poster"
-            app:layout_constraintStart_toStartOf="@+id/details_movie_poster"
-            app:layout_constraintTop_toBottomOf="@+id/details_movie_poster"
+            app:layout_constraintBottom_toTopOf="@+id/details_user_rating"
+            app:layout_constraintEnd_toEndOf="@+id/details_user_rating"
+            app:layout_constraintStart_toStartOf="@+id/details_user_rating"
             app:srcCompat="@drawable/ic_star_black_24dp" />
 
         <TextView
