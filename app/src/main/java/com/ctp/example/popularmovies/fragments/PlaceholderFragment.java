@@ -1,26 +1,28 @@
-package com.ctp.example.popularmovies;
+package com.ctp.example.popularmovies.fragments;
 
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ProgressBar;
+import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.ctp.example.popularmovies.AsyncTasks.JsonDownloadTaskLoader;
+import com.ctp.example.popularmovies.DetailsActivity;
+import com.ctp.example.popularmovies.MainActivity;
 import com.ctp.example.popularmovies.Model.Movie;
+import com.ctp.example.popularmovies.PopularAdapter;
+import com.ctp.example.popularmovies.R;
 import com.ctp.example.popularmovies.provider.MovieDbContract;
 import com.ctp.example.popularmovies.utils.MovieDbNetworkUtils;
 import com.ctp.example.popularmovies.utils.PopularMovieUtils;
@@ -29,10 +31,11 @@ import org.json.JSONException;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements
+public class PlaceholderFragment extends Fragment implements
         PopularAdapter.PopularAdapterClickListener,
-        LoaderManager.LoaderCallbacks<Object>{
+        LoaderManager.LoaderCallbacks<Object> {
 
+    private static final String ARG_SECTION_NUMBER = "section_number";
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String LOADER_BUNDLE_URL_KEY="the-url-key";
     private static final int LOADER_JSON_DOWNLOAD_KEY=1000;
@@ -48,43 +51,52 @@ public class MainActivity extends AppCompatActivity implements
     private List<Movie> moviesList;
 
     private RecyclerView gridRecyclerView;
-    private ProgressBar progressBar;
+
 
     private TextView errorMessage;
-    private Button refreshBtn;
+
 
     private boolean isErrorMessageDisplayed;
 
     private PopularAdapter theAdapter;
 
+    private SwipeRefreshLayout refreshLayout;
+
+
+    public PlaceholderFragment() {
+    }
+
+    /**
+     * Returns a new instance of this fragment for the given section
+     * number.
+     */
+    public static PlaceholderFragment newInstance(int sectionNumber) {
+        PlaceholderFragment fragment = new PlaceholderFragment();
+        Bundle args = new Bundle();
+        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_main2, container, false);
         isErrorMessageDisplayed = false;
-        gridRecyclerView = findViewById(R.id.recycler_grid);
-        progressBar =  findViewById(R.id.loading_indicator);
-        errorMessage = findViewById(R.id.error_message_display);
-        refreshBtn = findViewById(R.id.refresh_btn);
+        refreshLayout = rootView.findViewById(R.id.swipe_refresh);
+        gridRecyclerView = rootView.findViewById(R.id.recycler_grid);
+
+        errorMessage = rootView.findViewById(R.id.error_message_display);
         WIDTH_DIVIDER = Integer.parseInt(getString(R.string.width_divider));
 
 
-        GridLayoutManager theManager = new GridLayoutManager(this,numberOfColumns());
+        GridLayoutManager theManager = new GridLayoutManager(getContext(),numberOfColumns());
 
         gridRecyclerView.setLayoutManager(theManager);
         gridRecyclerView.setHasFixedSize(true);
 
 
 
-        refreshBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Bundle bundle = new Bundle();
-                bundle.putInt(LOADER_BUNDLE_URL_KEY,MovieDbNetworkUtils.POPULAR_MOVIES);
-                getSupportLoaderManager().restartLoader(LOADER_JSON_DOWNLOAD_KEY,bundle,MainActivity.this);
-            }
-        });
 
         if(savedInstanceState!=null){
             if(savedInstanceState.containsKey(BUNDLE_SAVE_FAV_STATE_KEY)){
@@ -92,98 +104,59 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
 
+        final int n = getArguments().getInt(ARG_SECTION_NUMBER);
+
+        startLoaderForTabNumber(n);
+
+
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                startLoaderForTabNumber(n);
+            }
+        });
+
+        return rootView;
     }
 
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu,menu);
-        return true;
-    }
-
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if(isDisplayingFavorites){
-            getSupportLoaderManager().restartLoader(LOADER_CURSOR_LOADER_KEY,null,this);
-        }else{
-            Bundle bundle = new Bundle();
-            bundle.putInt(LOADER_BUNDLE_URL_KEY, MovieDbNetworkUtils.POPULAR_MOVIES);
-            getSupportLoaderManager().initLoader(LOADER_JSON_DOWNLOAD_KEY, bundle, this);
-        }
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if(isDisplayingFavorites){
-            outState.putBoolean(BUNDLE_SAVE_FAV_STATE_KEY,isDisplayingFavorites);
-        }else{
-            outState.putBoolean(BUNDLE_SAVE_FAV_STATE_KEY,isDisplayingFavorites);
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
+    private void startLoaderForTabNumber(int n){
         Bundle bundle = new Bundle();
-        switch (id){
-            case R.id.sort_popular_btn:
+        switch (n){
+
+            case 1:
                 bundle.putInt(LOADER_BUNDLE_URL_KEY,MovieDbNetworkUtils.POPULAR_MOVIES);
-                getSupportLoaderManager().restartLoader(LOADER_JSON_DOWNLOAD_KEY,bundle,this);
-
+                getLoaderManager().restartLoader(LOADER_JSON_DOWNLOAD_KEY,bundle,this);
                 break;
-            case R.id.sort_toprated_btn:
+            case 2:
                 bundle.putInt(LOADER_BUNDLE_URL_KEY,MovieDbNetworkUtils.TOP_RATED_MOVIES);
-                getSupportLoaderManager().restartLoader(LOADER_JSON_DOWNLOAD_KEY,bundle,this);
-
+                getLoaderManager().restartLoader(LOADER_JSON_DOWNLOAD_KEY,bundle,this);
                 break;
-            case R.id.sort_favorite_btn:
-                getSupportLoaderManager().restartLoader(LOADER_CURSOR_LOADER_KEY,null,this);
+            case 3:
+                getLoaderManager().restartLoader(LOADER_CURSOR_LOADER_KEY,null,this);
                 break;
-            default:
-                return super.onOptionsItemSelected(item);
 
         }
-        return true;
-    }
-
-
-    @Override
-    public void onPosterClick(Movie movieClicked,boolean isCursorData) {
-
-        Intent intent = new Intent(MainActivity.this,DetailsActivity.class);
-        intent.putExtra(DetailsActivity.MOVIE_IS_CURSOR_DATA_KEY,isCursorData);
-        if(!isCursorData){
-            intent.putExtra(DetailsActivity.MOVIE_OBJECT_TRANSFER_KEY,movieClicked);
-        }
-        else{
-            intent.putExtra(DetailsActivity.MOVIE_STORED_ID_KEY,movieClicked.getId());
-        }
-        startActivity(intent);
-
     }
 
     @Override
     public Loader onCreateLoader(int id, Bundle args) {
-            preLoadChecks();
-            switch (id) {
-                case LOADER_JSON_DOWNLOAD_KEY:
-                    return new JsonDownloadTaskLoader(this, args.getInt(LOADER_BUNDLE_URL_KEY));
-                case LOADER_CURSOR_LOADER_KEY:
-                    return new CursorLoader(this,
-                            MovieDbContract.MovieFavoriteEntry.FAVORITE_CONTENT_URI,
-                            PopularMovieUtils.cursorLoaderProjection,
-                            null,
-                            null,
-                            null);
-                default:
-                    return null;
-            }
-
+        preLoadChecks();
+        switch (id) {
+            case LOADER_JSON_DOWNLOAD_KEY:
+                return new JsonDownloadTaskLoader(getContext(), args.getInt(LOADER_BUNDLE_URL_KEY));
+            case LOADER_CURSOR_LOADER_KEY:
+                return new CursorLoader(getContext(),
+                        MovieDbContract.MovieFavoriteEntry.FAVORITE_CONTENT_URI,
+                        PopularMovieUtils.cursorLoaderProjection,
+                        null,
+                        null,
+                        null);
+            default:
+                return null;
         }
+
+    }
 
     @Override
     public void onLoadFinished(Loader<Object> loader, Object data) {
@@ -202,17 +175,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onLoaderReset(Loader<Object> loader) {
-        updateRecyclerView(null,true);
-    }
 
-
-
-
-    private void preLoadChecks(){
-        if (isErrorMessageDisplayed) {
-            hideErrorMessage();
-        }
-        displayProgressBar();
     }
 
     private void displayJsonData(String theData){
@@ -239,13 +202,10 @@ public class MainActivity extends AppCompatActivity implements
 
     private void displayCursorData(Cursor data) {
         if(data.getCount()<=0){
-            Toast.makeText(this,getString(R.string.favorites_empty_msg),Toast.LENGTH_LONG).show();
             hideProgressBar();
-            if(isDisplayingFavorites){
-                Bundle bundle = new Bundle();
-                bundle.putInt(LOADER_BUNDLE_URL_KEY,MovieDbNetworkUtils.POPULAR_MOVIES);
-                getSupportLoaderManager().restartLoader(LOADER_JSON_DOWNLOAD_KEY,bundle,this);
-            }
+//            TODO: show no movies message
+            displayErrorMessage();
+            errorMessage.setText(getString(R.string.favorites_empty_msg));
             return;
         }
 
@@ -261,6 +221,20 @@ public class MainActivity extends AppCompatActivity implements
         hideProgressBar();
     }
 
+    @Override
+    public void onPosterClick(Movie movieClicked, boolean isCursorData) {
+        Intent intent = new Intent(getContext(),DetailsActivity.class);
+        intent.putExtra(DetailsActivity.MOVIE_IS_CURSOR_DATA_KEY,isCursorData);
+        if(!isCursorData){
+            intent.putExtra(DetailsActivity.MOVIE_OBJECT_TRANSFER_KEY,movieClicked);
+        }
+        else{
+            intent.putExtra(DetailsActivity.MOVIE_STORED_ID_KEY,movieClicked.getId());
+        }
+        startActivity(intent);
+    }
+
+
     private void updateRecyclerView(List<Movie> moviesList, boolean isCursorData){
         if (theAdapter == null) {
             theAdapter = new PopularAdapter(moviesList, this,isCursorData);
@@ -272,7 +246,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private int numberOfColumns() {
         DisplayMetrics displayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         // You can change this divider to adjust the size of the poster
         int widthDivider = 500;
         int width = displayMetrics.widthPixels;
@@ -281,20 +255,26 @@ public class MainActivity extends AppCompatActivity implements
         return nColumns;
     }
 
+    private void preLoadChecks(){
+        if (isErrorMessageDisplayed) {
+            hideErrorMessage();
+        }
+        displayProgressBar();
+    }
 
     private void hideProgressBar() {
-        progressBar.setVisibility(View.INVISIBLE);
         gridRecyclerView.setVisibility(View.VISIBLE);
+        refreshLayout.setRefreshing(false);
     }
 
     private void displayProgressBar() {
         gridRecyclerView.setVisibility(View.INVISIBLE);
-        progressBar.setVisibility(View.VISIBLE);
+        refreshLayout.setRefreshing(true);
+
     }
 
     private void displayErrorMessage() {
         gridRecyclerView.setVisibility(View.INVISIBLE);
-        refreshBtn.setVisibility(View.VISIBLE);
         errorMessage.setVisibility(View.VISIBLE);
         isErrorMessageDisplayed = true;
     }
@@ -302,9 +282,23 @@ public class MainActivity extends AppCompatActivity implements
     private void hideErrorMessage(){
 
         errorMessage.setVisibility(View.INVISIBLE);
-        refreshBtn.setVisibility(View.INVISIBLE);
         gridRecyclerView.setVisibility(View.VISIBLE);
         isErrorMessageDisplayed = false;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(isDisplayingFavorites){
+            outState.putBoolean(BUNDLE_SAVE_FAV_STATE_KEY,isDisplayingFavorites);
+        }else{
+            outState.putBoolean(BUNDLE_SAVE_FAV_STATE_KEY,isDisplayingFavorites);
+        }
     }
 
 

@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -64,7 +65,7 @@ public class DetailsActivity extends AppCompatActivity
     private static final String LOADER_BUNDLE_MOVIE_KEY="movie-id-key";
 
     private static final String INSTANCE_BOOLEAN_STATE_KEY = "booll";
-
+    private static final String BUNDLE_SCROLL_POSITION = "scroll-bundle" ;
 
 
     private ImageView moviePoster;
@@ -86,9 +87,12 @@ public class DetailsActivity extends AppCompatActivity
     private TrailerAdapter trailerAdapter;
 
     private Trailer firstTrailer;
+    private ScrollView scrollView;
 
     private boolean isAddedToFavorites;
     private boolean isCursorData;
+
+    private int scrollY = 0;
 
 
     @Override
@@ -96,6 +100,7 @@ public class DetailsActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
 
+        scrollView = findViewById(R.id.details_scroll_view);
         moviePoster = findViewById(R.id.details_movie_poster);
         movieTitle =  findViewById(R.id.details_movie_title);
         synopsis = findViewById(R.id.details_synopsis);
@@ -107,6 +112,9 @@ public class DetailsActivity extends AppCompatActivity
         noTrailerTextView = findViewById(R.id.details_no_trailer_textview);
         noReviewTextView = findViewById(R.id.details_no_reviews_textview);
 
+        reviewListView.setNestedScrollingEnabled(false);
+        trailerListView.setNestedScrollingEnabled(false);
+
         LinearLayoutManager manager1 = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         LinearLayoutManager manager2 = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         trailerListView.setLayoutManager(manager1);
@@ -115,6 +123,14 @@ public class DetailsActivity extends AppCompatActivity
         reviewListView.setHasFixedSize(true);
 
         getMovieObjectFromSender();
+
+        if(savedInstanceState!=null){
+            scrollY = savedInstanceState.getInt(BUNDLE_SCROLL_POSITION);
+        }
+
+
+
+
     }
 
 
@@ -147,8 +163,11 @@ public class DetailsActivity extends AppCompatActivity
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(INSTANCE_BOOLEAN_STATE_KEY,isAddedToFavorites);
+        outState.putInt(BUNDLE_SCROLL_POSITION,scrollView.getScrollY());
 
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -255,6 +274,7 @@ public class DetailsActivity extends AppCompatActivity
         executeTrailerAndReviewLoaders(movie.getId());
         //TODO: start task to get Movies and reviews. Create a method
 
+
     }
 
     private void displayDataFromMovieObject(){
@@ -273,6 +293,8 @@ public class DetailsActivity extends AppCompatActivity
         bundle.putInt(MOVIE_STORED_ID_KEY,movie.getId());
         getSupportLoaderManager().restartLoader(CURSOR_LOADER_CHECK_IF_FAVORITE_KEY,bundle,this);
         executeTrailerAndReviewLoaders(movie.getId());
+
+
     }
 
     private void displayReviewData(String reviewData){
@@ -298,7 +320,12 @@ public class DetailsActivity extends AppCompatActivity
         }else {
             displayNoReviewsMessage();
         }
-
+        scrollView.post(new Runnable() {
+            @Override
+            public void run() {
+                scrollView.scrollTo(0,scrollY);
+            }
+        });
     }
 
     private void displayTrailerData(String trailerData){
@@ -432,5 +459,8 @@ public class DetailsActivity extends AppCompatActivity
         noReviewTextView.setVisibility(View.VISIBLE);
         reviewListView.setVisibility(View.GONE);
     }
+
+
+
 }
 

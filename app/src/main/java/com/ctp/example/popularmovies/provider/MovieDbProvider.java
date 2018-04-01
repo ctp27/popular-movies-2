@@ -139,12 +139,15 @@ public class MovieDbProvider extends ContentProvider {
                 } else {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
+
+
                 break;
 
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
 
+        getContext().getContentResolver().notifyChange(uri, null);
 
 
         return returnUri;
@@ -172,9 +175,9 @@ public class MovieDbProvider extends ContentProvider {
         }
 
         /* If we actually deleted any rows, notify that a change has occurred to this URI */
-//        if (numRowsDeleted != 0) {
-//            getContext().getContentResolver().notifyChange(uri, null);
-//        }
+        if (numRowsDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
 
         return numRowsDeleted;
     }

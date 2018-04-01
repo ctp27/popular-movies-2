@@ -2,7 +2,7 @@
     <string name="app_name">Popular Movies</string>
     <string name="pop_menu_item">Popular</string>
     <string name="toprated_menu_item">Top Rated</string>
-    <string name="err_msg">Whoops! There was an error fetching the data. Check your internet connection and try aggain</string>
+    <string name="err_msg">This category is unavailable in offline mode. Check your internet connection and try again</string>
     <string name="refresh">Refresh</string>
     <string name="movie_poster">Movie Poster</string>
     <string name="synopsis">Synopsis</string>
@@ -29,4 +29,11 @@
     <string name="rating_star_contentdesc">Rating star image</string>
     <string name="review_account_img_contentdesc">Author account icon</string>
     <string name="trailer_list_img_contentdesc">Play Trailer icon</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="tab_text_1">Popular</string>
+    <string name="tab_text_2">Top Rated</string>
+    <string name="tab_text_3">Favorites</string>
+    <string name="error_cursor">You currently have no favorites.</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
 </resources>
