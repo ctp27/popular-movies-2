@@ -1,6 +1,9 @@
 /build
-/gradle.properties
+
 /gradle
+
+gradle.properties
+keystore.properties
 
 # Built application files
 *.apk
