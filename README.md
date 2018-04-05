@@ -24,7 +24,14 @@ Users can view movie trailers and reviews. They can also share links of the trai
 
 # Setup up Popular Movies
 
-Create and add your own MovieDb.org API key in gradle.properties.
+1. Clone the repository.
+2. Import it as an existing project in Android Studio.
+3. Create your own MovieDb.org API key
+4. Add your API_Key to the gradle.properties file.
+For example, API_KEY = "INSERT_YOUR_API_KEY"
+
+
+
 
 # Download from Google Play
 The application is available on Google Play. You can follow this link to
