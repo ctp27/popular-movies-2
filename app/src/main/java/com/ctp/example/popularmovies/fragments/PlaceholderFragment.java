@@ -19,7 +19,6 @@ import android.widget.TextView;
 
 import com.ctp.example.popularmovies.AsyncTasks.JsonDownloadTaskLoader;
 import com.ctp.example.popularmovies.DetailsActivity;
-import com.ctp.example.popularmovies.MainActivity;
 import com.ctp.example.popularmovies.Model.Movie;
 import com.ctp.example.popularmovies.PopularAdapter;
 import com.ctp.example.popularmovies.R;
@@ -36,7 +35,7 @@ public class PlaceholderFragment extends Fragment implements
         LoaderManager.LoaderCallbacks<Object> {
 
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String TAG = PlaceholderFragment.class.getSimpleName();
     private static final String LOADER_BUNDLE_URL_KEY="the-url-key";
     private static final int LOADER_JSON_DOWNLOAD_KEY=1000;
     private static final int LOADER_CURSOR_LOADER_KEY = 2000;

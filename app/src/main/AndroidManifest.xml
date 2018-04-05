@@ -13,11 +13,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
-            android:launchMode="singleTop">
-
-        </activity>
-        <activity
             android:name=".DetailsActivity"
             android:parentActivityName=".Main2Activity"
             tools:targetApi="jelly_bean">
