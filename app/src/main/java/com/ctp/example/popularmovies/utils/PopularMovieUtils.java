@@ -38,7 +38,7 @@ public class PopularMovieUtils  {
     private static final int MOVIE_RATING_INDEX=4;
     private static final int MOVIE_SYNOPSIS_INDEX = 5;
 
-    private static final String IMG_BASE_URL="http://image.tmdb.org/t/p/w780";
+    private static final String IMG_BASE_URL="http://image.tmdb.org/t/p/w185";
 
 
     public static List<Movie> getMoviesListFromJson(String jsonString) throws JSONException {
